@@ -2,6 +2,8 @@ package com.tbs.demo;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,7 +18,9 @@ import android.os.Message;
 import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -30,8 +34,12 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.tbs.demo.utils.X5WebView;
+import com.tencent.smtt.export.external.extension.interfaces.IX5WebViewClientExtension;
+import com.tencent.smtt.export.external.extension.proxy.ProxyWebViewClientExtension;
 import com.tencent.smtt.export.external.interfaces.IX5WebChromeClient.CustomViewCallback;
 import com.tencent.smtt.export.external.interfaces.JsResult;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
 import com.tencent.smtt.sdk.CookieSyncManager;
 import com.tencent.smtt.sdk.DownloadListener;
 import com.tencent.smtt.sdk.ValueCallback;
@@ -39,6 +47,7 @@ import com.tencent.smtt.sdk.WebChromeClient;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
 import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewCallbackClient;
 import com.tencent.smtt.sdk.WebViewClient;
 import com.tencent.smtt.utils.TbsLog;
 
@@ -57,7 +66,7 @@ public class BrowserActivity extends Activity {
 	private EditText mUrl;
 
 	private static final String mHomeUrl = "http://app.html5.qq.com/navi/index";
-	private static final String TAG = "SdkDemo";
+	private static final String TAG = "TbsDemo";
 	private static final int MAX_LENGTH = 14;
 	private boolean mNeedTestPage = false;
 
@@ -147,6 +156,13 @@ public class BrowserActivity extends Activity {
 				FrameLayout.LayoutParams.FILL_PARENT));
 
 		initProgressBar();
+
+		// Event processing
+		mWebView.setWebViewCallbackClient(mCallbackClient);
+
+		if (mWebView.getX5WebViewExtension() != null) {
+			mWebView.getX5WebViewExtension().setWebViewClientExtension(mWebViewClientExtension );
+		}
 
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
@@ -297,6 +313,118 @@ public class BrowserActivity extends Activity {
 		CookieSyncManager.createInstance(this);
 		CookieSyncManager.getInstance().sync();
 	}
+
+
+	class CallbackClient implements WebViewCallbackClient {
+
+		@Override
+		public void invalidate()
+		{
+		}
+
+		@Override
+		public boolean onTouchEvent(MotionEvent event, View view) {
+
+			Log.i(TAG, "callbackclient -- onTouchEvent: " + event + "; view: " + view);
+
+			return mWebView.super_onTouchEvent(event);
+		}
+
+		@Override
+		public boolean overScrollBy(int deltaX, int deltaY, int scrollX,
+									int scrollY, int scrollRangeX, int scrollRangeY,
+									int maxOverScrollX, int maxOverScrollY,
+									boolean isTouchEvent, View view) {
+
+			return mWebView.super_overScrollBy(deltaX, deltaY, scrollX, scrollY,
+					scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY,
+					isTouchEvent);
+		}
+
+		@Override
+		public void computeScroll(View view) {
+
+			mWebView.super_computeScroll();
+		}
+
+		@Override
+		public void onOverScrolled(int scrollX, int scrollY, boolean clampedX,
+								   boolean clampedY, View view) {
+
+			mWebView.super_onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+		}
+
+		@Override
+		public void onScrollChanged(int l, int t, int oldl, int oldt, View view) {
+
+			mWebView.super_onScrollChanged(l, t, oldl, oldt);
+		}
+
+		@Override
+		public boolean dispatchTouchEvent(MotionEvent ev, View view) {
+
+			return mWebView.super_dispatchTouchEvent(ev);
+		}
+
+		@Override
+		public boolean onInterceptTouchEvent(MotionEvent ev, View view) {
+
+			return mWebView.super_onInterceptTouchEvent(ev);
+		}
+
+	};
+
+	private CallbackClient mCallbackClient = new CallbackClient();
+
+	private IX5WebViewClientExtension mWebViewClientExtension = new ProxyWebViewClientExtension() {
+
+
+		@Override
+		public void invalidate() {
+		}
+
+		@Override
+		public void onReceivedViewSource(String data) {
+		};
+
+		@Override
+		public boolean onTouchEvent(MotionEvent event, View view) {
+
+			return mCallbackClient.onTouchEvent(event, view);
+		}
+
+		// 1
+		public boolean onInterceptTouchEvent(MotionEvent ev, View view) {
+			return mCallbackClient.onInterceptTouchEvent(ev, view);
+		}
+
+		// 3
+		public boolean dispatchTouchEvent(MotionEvent ev, View view) {
+			return mCallbackClient.dispatchTouchEvent(ev, view);
+		}
+		// 4
+		public boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY,
+									int scrollRangeX, int scrollRangeY,
+									int maxOverScrollX, int maxOverScrollY,
+									boolean isTouchEvent, View view) {
+			return mCallbackClient.overScrollBy(deltaX, deltaY, scrollX, scrollY,
+					scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY, isTouchEvent, view);
+		}
+		// 5
+		public void onScrollChanged(int l, int t, int oldl, int oldt, View view) {
+			mCallbackClient.onScrollChanged(l, t, oldl, oldt, view);
+		}
+		// 6
+		public void onOverScrolled(int scrollX, int scrollY, boolean clampedX,
+								   boolean clampedY, View view) {
+			mCallbackClient.onOverScrolled(scrollX, scrollY, clampedX, clampedY, view);
+		}
+		// 7
+		public void computeScroll(View view) {
+			mCallbackClient.computeScroll(view);
+		}
+	};
+
 
 	private void initBtnListenser() {
 		mBack = (ImageButton) findViewById(R.id.btnBack1);
