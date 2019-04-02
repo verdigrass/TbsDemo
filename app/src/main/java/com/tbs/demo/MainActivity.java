@@ -73,8 +73,8 @@ public class MainActivity extends Activity {
 			throw new IllegalArgumentException("the gridView is null");
 
 		titles = getResources().getStringArray(R.array.index_titles);
-		int[] iconResourse = { R.drawable.tbsweb, R.drawable.fullscreen,
-				R.drawable.filechooser };
+		int[] iconResourse = { R.drawable.tbsweb, R.drawable.play_btn,
+				R.drawable.files_btn };
 
 		HashMap<String, Object> item = null;
 		// HashMap<String, ImageView> block = null;
@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
 	private void tbsSuiteExit() {
 		// exit TbsSuite?
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-		dialog.setTitle("X5功能演示");
+		dialog.setTitle("TbsDemo");
 		dialog.setPositiveButton("OK", new AlertDialog.OnClickListener() {
 
 			@Override
@@ -160,7 +160,7 @@ public class MainActivity extends Activity {
 				Process.killProcess(Process.myPid());
 			}
 		});
-		dialog.setMessage("quit now?");
+		dialog.setMessage(R.string.exit_prompt);
 		dialog.create().show();
 	}
 }

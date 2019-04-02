@@ -488,11 +488,11 @@ public class BrowserActivity extends Activity {
 						return;
 					if (mWebView.getUrl().equalsIgnoreCase(mHomeUrl)) {
 						mUrl.setText("");
-						mGo.setText("首页");
+						mGo.setText("Home");
 						mGo.setTextColor(0X6F0F0F0F);
 					} else {
 						mUrl.setText(mWebView.getUrl());
-						mGo.setText("进入");
+						mGo.setText("Enter");
 						mGo.setTextColor(0X6F0000CD);
 					}
 				} else {

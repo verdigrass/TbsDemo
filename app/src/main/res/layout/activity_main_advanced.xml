@@ -4,22 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/tip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="@string/tip"
-        android:textColor="#ff0000"
-        android:textIsSelectable="false"
-        android:textSize="10sp" />
-
     <RelativeLayout
         android:id="@+id/first_Text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tip"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
         android:background="#ffffff" >
 
         <TextView
@@ -30,8 +20,8 @@
             android:text="@string/tag"
             android:textColor="@android:color/black"
             android:textIsSelectable="false"
-            android:textSize="15sp"
-            android:textStyle="italic" />
+            android:textSize="23sp"
+            android:textStyle="normal|bold" />
     </RelativeLayout>
 
     <GridView
