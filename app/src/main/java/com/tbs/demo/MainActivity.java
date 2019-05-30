@@ -28,9 +28,10 @@ public class MainActivity extends Activity {
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////////
 	// add constant here
-	private static final int TBS_WEB = 0;
+	private static final int TBS_WEB = 3;
 	private static final int FULL_SCREEN_VIDEO = 1;
 	private static final int FILE_CHOOSER = 2;
+	private static final int TBS_KOTLIN = 0;
 
 	// /////////////////////////////////////////////////////////////////////////////////////////////
 	// for view init
@@ -73,8 +74,12 @@ public class MainActivity extends Activity {
 			throw new IllegalArgumentException("the gridView is null");
 
 		titles = getResources().getStringArray(R.array.index_titles);
-		int[] iconResourse = { R.drawable.tbsweb, R.drawable.play_btn,
-				R.drawable.files_btn };
+		int[] iconResourse = {
+				R.drawable.tbsweb,
+				R.drawable.play_btn,
+				R.drawable.files_btn,
+				R.drawable.ic_launcher
+		};
 
 		HashMap<String, Object> item = null;
 		// HashMap<String, ImageView> block = null;
@@ -86,8 +91,9 @@ public class MainActivity extends Activity {
 			items.add(item);
 		}
 		this.gridAdapter = new SimpleAdapter(this, items,
-				R.layout.function_block, new String[] { "title", "icon" },
-				new int[] { R.id.Item_text, R.id.Item_bt });
+				R.layout.function_block, new String[]{"title", "icon"},
+				new int[]{R.id.Item_text, R.id.Item_bt});
+
 		if (null != this.gridView) {
 			this.gridView.setAdapter(gridAdapter);
 			this.gridAdapter.notifyDataSetChanged();
@@ -95,29 +101,40 @@ public class MainActivity extends Activity {
 
 				@Override
 				public void onItemClick(AdapterView<?> gridView, View view,
-						int position, long id) {
+										int position, long id) {
 					Intent intent = null;
+
 					switch (position) {
-					case FILE_CHOOSER: {
-						intent = new Intent(MainActivity.this,
-								FilechooserActivity.class);
-						MainActivity.this.startActivity(intent);
+						case FILE_CHOOSER: {
+							intent = new Intent(MainActivity.this,
+									FilechooserActivity.class);
+							mContext.startActivity(intent);
 
-					}
-						break;
-					case FULL_SCREEN_VIDEO: {
-						intent = new Intent(MainActivity.this,
-								FullScreenActivity.class);
-						MainActivity.this.startActivity(intent);
-					}
+						}
 						break;
 
-					case TBS_WEB: {
-						intent = new Intent(MainActivity.this,
-								BrowserActivity.class);
-						MainActivity.this.startActivity(intent);
+						case FULL_SCREEN_VIDEO: {
+							intent = new Intent(MainActivity.this,
+									FullScreenActivity.class);
+							mContext.startActivity(intent);
+						}
+						break;
 
-					}
+						case TBS_WEB: {
+							intent = new Intent(MainActivity.this,
+									BrowserActivity.class);
+							mContext.startActivity(intent);
+
+						}
+						break;
+
+						case TBS_KOTLIN: {
+
+							intent = new Intent(MainActivity.this,
+									KotlinActivity.class);
+							mContext.startActivity(intent);
+
+						}
 						break;
 
 					}

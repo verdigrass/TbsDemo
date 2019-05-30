@@ -106,7 +106,7 @@
             android:layout_weight="1"
             android:background="#ECF0F2"
             android:padding="10dp"
-            android:src="@drawable/theme_toolbar_btn_menu_fg_normal" />
+            android:src="@drawable/debug" />
 
         <ImageButton
             android:id="@+id/btnHome1"

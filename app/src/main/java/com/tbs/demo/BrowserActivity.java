@@ -1,7 +1,11 @@
 package com.tbs.demo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -10,9 +14,15 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
@@ -147,6 +157,39 @@ public class BrowserActivity extends Activity {
 				.getDrawable(R.drawable.color_progressbar));
 	}
 
+	void fetchFileTime(Context context) {
+
+		try {
+			String packageName = context.getApplicationContext().getApplicationInfo().packageName;
+
+			File tbslog = new File(Environment.getExternalStorageDirectory(), "Android/data/" + packageName + "/files/tbslog/tbslog.txt");
+
+			long time = tbslog.lastModified();
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String timestamp = formatter.format(time);
+
+			String info = "timestamp_tbslogx: " + timestamp + "\n";
+
+			File tbslogx = new File(Environment.getExternalStorageDirectory(), "Android/data/" + packageName + "/files/tbslog/tbslogx.txt");
+
+			int max_size = 1 * 1024 * 1024;
+			if (tbslogx.exists() && tbslogx.length() > max_size) {
+				tbslogx.delete();
+				tbslogx.createNewFile();
+			}
+
+			FileOutputStream fos = new FileOutputStream(tbslogx, true);
+
+			fos.write(info.getBytes());
+			fos.flush();
+
+			Log.e(TAG, "fetchFileTime: " + info);
+
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
 	private void init() {
 
 		mWebView = new X5WebView(this, null);
@@ -156,6 +199,10 @@ public class BrowserActivity extends Activity {
 				FrameLayout.LayoutParams.FILL_PARENT));
 
 		initProgressBar();
+
+
+		fetchFileTime(this);
+
 
 		// Event processing
 		mWebView.setWebViewCallbackClient(mCallbackClient);
@@ -178,6 +225,17 @@ public class BrowserActivity extends Activity {
 				if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16)
 					changGoForwardButton(view);
 				/* mWebView.showLog("test Log"); */
+
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							fetchFileTime(mWebView.getContext());
+						} catch (Throwable t) {
+							t.printStackTrace();
+						}
+					}
+				}).start();
 			}
 		});
 
@@ -339,6 +397,8 @@ public class BrowserActivity extends Activity {
 			return mWebView.super_overScrollBy(deltaX, deltaY, scrollX, scrollY,
 					scrollRangeX, scrollRangeY, maxOverScrollX, maxOverScrollY,
 					isTouchEvent);
+
+
 		}
 
 		@Override
@@ -433,7 +493,9 @@ public class BrowserActivity extends Activity {
 		mHome = (ImageButton) findViewById(R.id.btnHome1);
 		mGo = (Button) findViewById(R.id.btnGo1);
 		mUrl = (EditText) findViewById(R.id.editUrl1);
+
 		mMore = (ImageButton) findViewById(R.id.btnMore);
+
 		if (Integer.parseInt(android.os.Build.VERSION.SDK) >= 16) {
 			mBack.setAlpha(disable);
 			mForward.setAlpha(disable);
@@ -473,8 +535,7 @@ public class BrowserActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				Toast.makeText(BrowserActivity.this, "not completed",
-						Toast.LENGTH_LONG).show();
+				mWebView.loadUrl("http://debugtbs.qq.com");
 			}
 		});
 
